@@ -19,4 +19,5 @@ module vnetModule 'vnet.bicep' = {
 }
 
 output createdSubnets object = reduce(vnetModule.outputs.actualSubnets, {}, (cur, next) => union(cur, next))
+// For demonstration purposes only - this is not used (or usable, probably)
 output vnetModuleOutput array = vnetModule.outputs.actualSubnets

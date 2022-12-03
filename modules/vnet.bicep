@@ -4,6 +4,8 @@ param subnetDefs object
 param vnetAddressPrefix string
 
 param tags object = {}
+
+// This will sort the subnets alphabetically by name
 var subnetDefsArray = items(subnetDefs)
 
 resource vnet 'Microsoft.Network/virtualNetworks@2022-05-01' = {
@@ -15,9 +17,12 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-05-01' = {
         vnetAddressPrefix
       ]
     }
+    // Loop through each subnet in the array
     subnets: [for (subnet, i) in subnetDefsArray: {
+      // The name of the subnet (property name) became the key property
       name: subnet.key
       properties: {
+        // All other properties are child properties of the value property
         addressPrefix: subnet.value.addressPrefix
         serviceEndpoints: subnet.value.serviceEndpoints
         delegations: empty(subnet.value.delegation) ? null : [
@@ -34,12 +39,18 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-05-01' = {
   tags: tags
 }
 
-// Outputs in the order of subnetDefsArray (alphabetically by subnet name)
-// TODO: Is it guaranteed that the order of the subnets in the virtual network is the same as passed in?
-// Prior experience suggests this might not always be the case.
-output actualSubnets array = [for (subnet, i) in subnetDefsArray: {
-  '${subnet.key}': {
-    id: vnet.properties.subnets[i].id
-    addressPrefix: vnet.properties.subnets[i].properties.addressPrefix
+// Retrieve the subnets as an array of existing resources
+// This is important because we need to ensure subnet properties match the name
+resource subnetRes 'Microsoft.Network/virtualNetworks/subnets@2022-05-01' existing = [for subnet in subnetDefsArray: {
+  name: subnet.key
+  parent: vnet
+}]
+
+// Outputs in the order of the virtual network, which is not necessarily the order of subnetDefsArray
+output actualSubnets array = [for i in range(0, length(subnetDefsArray)): {
+  '${subnetRes[i].name}': {
+    id: subnetRes[i].id
+    addressPrefix: subnetRes[i].properties.addressPrefix
+    // Add as many additional subnet properties as needed downstream
   }
 }]
