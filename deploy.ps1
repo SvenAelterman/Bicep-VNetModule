@@ -12,31 +12,32 @@ Param(
 	[ValidateSet('test', 'demo', 'prod')]
 	[string]$Environment = 'test',
 	#
-	[Parameter(Mandatory = $true)]
-	[string]$WorkloadName,
+	#[Parameter(Mandatory = $true)]
+	[string]$WorkloadName = 'bicepvnet',
 	#
-	[int]$Sequence = 1,
-	[string]$NamingConvention = "{rtype}-{wloadname}-{env}-{loc}-{seq}"
+	[int]$Sequence = 1#,
+	#[string]$NamingConvention = "{rtype}-{wloadname}-{env}-{loc}-{seq}"
 )
 
 $TemplateParameters = @{
 	# REQUIRED
-	location         = $Location
-	environment      = $Environment
-	workloadName     = $WorkloadName
+	location     = $Location
+	environment  = $Environment
+	workloadName = $WorkloadName
 
 	# OPTIONAL
-	sequence         = $Sequence
-	namingConvention = $NamingConvention
-	tags             = @{
+	sequence     = $Sequence
+	#namingConvention = $NamingConvention
+	tags         = @{
 		'date-created' = (Get-Date -Format 'yyyy-MM-dd')
 		purpose        = $Environment
 		lifetime       = 'short'
 	}
 }
 
-$DeploymentResult = New-AzDeployment -Location $Location -Name "$WorkloadName-$Environment-$(Get-Date -Format 'yyyyMMddThhmmssZ' -AsUTC)" `
-	-TemplateFile ".\main.bicep" -TemplateParameterObject $TemplateParameters
+$DeploymentResult = New-AzResourceGroupDeployment -Location $Location -Name "$WorkloadName-$Environment-$(Get-Date -Format 'yyyyMMddThhmmssZ' -AsUTC)" `
+	-TemplateFile ".\main.bicep" -TemplateParameterObject $TemplateParameters `
+	-ResourceGroupName 'rg-bicepvnet-test-eastus-01'
 
 $DeploymentResult
 
