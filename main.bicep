@@ -52,6 +52,8 @@ var subnetDefs = {
   }
 }
 
+// TODO: Add union example for optional subnets
+
 module networkModule 'modules/network.bicep' = {
   name: replace(deploymentNameStructure, '{rtype}', 'network')
   params: {
