@@ -35,6 +35,7 @@ var namingStructure = replace(replace(replace(replace(namingConvention, '{env}',
     addressPrefix: string (required)
     serviceEndpoints: array
     securityRules: array (optional; if ommitted, no NSG will be created. If [], a default NSG will be created.)
+    routes: array (optional; if ommitted, no route table will be created. If [], an empty route table will be created.)
     delegation: string (optional, can be ommitted or be empty string)
   }
 */
