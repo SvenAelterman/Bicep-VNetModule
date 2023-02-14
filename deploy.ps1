@@ -15,8 +15,7 @@ Param(
 	#[Parameter(Mandatory = $true)]
 	[string]$WorkloadName = 'bicepvnet',
 	#
-	[int]$Sequence = 1#,
-	#[string]$NamingConvention = "{rtype}-{wloadname}-{env}-{loc}-{seq}"
+	[int]$Sequence = 1
 )
 
 $TemplateParameters = @{
@@ -35,9 +34,8 @@ $TemplateParameters = @{
 	}
 }
 
-$DeploymentResult = New-AzResourceGroupDeployment -Location $Location -Name "$WorkloadName-$Environment-$(Get-Date -Format 'yyyyMMddThhmmssZ' -AsUTC)" `
-	-TemplateFile ".\main.bicep" -TemplateParameterObject $TemplateParameters `
-	-ResourceGroupName 'rg-bicepvnet-test-eastus-01'
+$DeploymentResult = New-AzDeployment -Location $Location -Name "$WorkloadName-$Environment-$(Get-Date -Format 'yyyyMMddThhmmssZ' -AsUTC)" `
+	-TemplateFile ".\main.bicep" -TemplateParameterObject $TemplateParameters
 
 $DeploymentResult
 
