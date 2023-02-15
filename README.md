@@ -18,7 +18,7 @@ Contains the modules for the sample to deploy.
 
 #### network.bicep
 
-Calls the virtual network module, but crucially takes the array output of the virtual network module and reduces it so it comes out as an object instead of an array.
+This is the main network module and what you should use in your main.bicep. It calls the network security, route table and virtual network modules, but crucially takes the array output of the virtual network module and reduces it so it comes out as an object instead of an array.
 
 `reduce(vnetModule.outputs.actualSubnets, {}, (cur, next) => union(cur, next))`
 
@@ -65,6 +65,10 @@ The output of this module is an array of custom objects, each of which has a sin
 ```
 
 You can now see how using the reduce function will reduce this array to a custom object which will have as many properties as there are subnets.
+
+### appService.bicep
+
+This is a sample module only, to demonstrate how to use the output from *network.bicep* as a parameter for a depending module.
 
 ## Parameters
 

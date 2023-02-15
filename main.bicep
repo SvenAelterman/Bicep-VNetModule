@@ -105,7 +105,6 @@ module networkModule 'modules/network.bicep' = {
   name: replace(deploymentNameStructure, '{rtype}', 'network')
   scope: rg
   params: {
-    vnetName: replace(namingStructure, '{rtype}', 'vnet')
     deploymentNameStructure: deploymentNameStructure
     namingStructure: namingStructure
     location: location
@@ -131,4 +130,4 @@ module appServiceModule 'modules/appService.bicep' = {
 }
 
 output createdSubnets object = networkModule.outputs.createdSubnets
-output vnetModuleOutput array = networkModule.outputs.vnetModuleOutput
+output vNetModuleOutput array = networkModule.outputs.vNetModuleSubnetsOutput

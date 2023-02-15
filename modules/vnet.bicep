@@ -64,6 +64,10 @@ output actualSubnets array = [for i in range(0, length(subnetDefsArray)): {
   '${subnetRes[i].name}': {
     id: subnetRes[i].id
     addressPrefix: subnetRes[i].properties.addressPrefix
+    routeTableId: contains(subnetRes[i].properties, 'routeTable') ? subnetRes[i].properties.routeTable.id : null
+    networkSecurityGroupId: contains(subnetRes[i].properties, 'networkSecurityGroup') ? subnetRes[i].properties.networkSecurityGroup.id : null
     // Add as many additional subnet properties as needed downstream
   }
 }]
+
+output vNetId string = vnet.id
