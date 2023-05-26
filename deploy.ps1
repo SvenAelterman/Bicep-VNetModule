@@ -40,4 +40,5 @@ $DeploymentResult = New-AzDeployment -Location $Location -Name "$WorkloadName-$E
 $DeploymentResult
 
 if ($DeploymentResult.ProvisioningState -eq 'Succeeded') {
+	Write-Host "🔥 Deployment successful"
 }

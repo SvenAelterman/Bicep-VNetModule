@@ -16,3 +16,4 @@ resource rt 'Microsoft.Network/routeTables@2022-01-01' = {
 }
 
 output routeTableId string = rt.id
+output routeTableName string = rt.name

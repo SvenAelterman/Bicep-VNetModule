@@ -24,5 +24,6 @@ module rtModule 'rt.bicep' = [for subnet in subnetArray: {
 output routeTableIds array = [for i in range(0, length(subnetArray)): {
   '${subnetArray[i].key}': {
     id: rtModule[i].outputs.routeTableId
+    name: rtModule[i].outputs.routeTableName
   }
 }]

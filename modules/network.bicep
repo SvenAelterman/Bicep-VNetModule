@@ -45,7 +45,7 @@ module networkSecurityModule 'networkSecurity.bicep' = {
   }
 }
 
-var nsgIds = reduce(networkSecurityModule.outputs.nsgIds, {}, (cur, next) => union(cur, next))
+var nsgIds = reduce(networkSecurityModule.outputs.networkSecurityGroups, {}, (cur, next) => union(cur, next))
 
 // Create a route table for each subnet that requires one
 module networkRoutingModule 'networkRouting.bicep' = {
