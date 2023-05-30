@@ -101,7 +101,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   tags: tags
 }
 
-module networkModule 'modules/network.bicep' = {
+module networkModule 'modules/networking/network.bicep' = {
   name: replace(deploymentNameStructure, '{rtype}', 'network')
   scope: rg
   params: {
@@ -117,7 +117,7 @@ module networkModule 'modules/network.bicep' = {
 // Can use the output object of networkModule here to get properties from specific subnets by name
 
 // E.g., create an app service with vnet integration
-module appServiceModule 'modules/appService.bicep' = {
+module appServiceModule 'modules/samples/appService.bicep' = {
   name: replace(deploymentNameStructure, '{rtype}', 'appService')
   scope: rg
   params: {
