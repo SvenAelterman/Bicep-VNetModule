@@ -22,7 +22,9 @@ param vnetAddressPrefix string = '10.0.{octet3}.0'
 param vnetCidr string = '16'
 param subnetCidr string = '24'
 param customDnsIPs array = []
+
 param includeAppGwSubnet bool = true
+param deploySampleAppSerice bool = false
 
 var sequenceFormatted = format('{0:00}', sequence)
 var deploymentNameStructure = '${workloadName}-${environment}-{rtype}-${deploymentTime}'
@@ -32,16 +34,16 @@ var namingStructure = replace(replace(replace(replace(namingConvention, '{env}',
 
 /*
   Object Schema
-  subnet-name: {
+  NameOfSubnet: {
     addressPrefix: string (required)
-    serviceEndpoints: array
+    serviceEndpoints: array (optional)
     securityRules: array (optional; if ommitted, no NSG will be created. If [], a default NSG will be created.)
     routes: array (optional; if ommitted, no route table will be created. If [], an empty route table will be created.)
     delegation: string (optional, can be ommitted or be empty string)
   }
 */
 var subnetDefs = {
-  compute: {
+  ComputeSubnet: {
     addressPrefix: '${replace(vnetAddressPrefix, '{octet3}', '0')}/${subnetCidr}'
     serviceEndpoints: [
       {
@@ -64,7 +66,7 @@ var subnetDefs = {
     // Create an empty route table
     routes: []
   }
-  appservice: {
+  AppServiceSubnet: {
     addressPrefix: '${replace(vnetAddressPrefix, '{octet3}', '1')}/${subnetCidr}'
     serviceEndpoints: []
     // Specify an empty array of security rules. Network security group for this subnet will be created, but only contain default rules.
@@ -77,11 +79,12 @@ var subnetDefs = {
 }
 
 var appGwSubnet = includeAppGwSubnet ? {
-  appGw: {
+  ApplicationGatewaySubnet: {
     addressPrefix: '${replace(vnetAddressPrefix, '{octet3}', '255')}/${subnetCidr}'
     securityRules: []
     // Explicitly specify no delegation of this subnet
     delegation: ''
+    // TODO: Pull routes from JSON content files
     routes: [
       {
         name: 'Internet-Direct'
@@ -119,7 +122,7 @@ module networkModule 'modules/networking/network.bicep' = {
 // Can use the output object of networkModule here to get properties from specific subnets by name
 
 // E.g., create an app service with vnet integration
-module appServiceModule 'modules/samples/appService.bicep' = {
+module appServiceModule 'modules/samples/appService.bicep' = if (deploySampleAppSerice) {
   name: replace(deploymentNameStructure, '{rtype}', 'appService')
   scope: rg
   params: {
