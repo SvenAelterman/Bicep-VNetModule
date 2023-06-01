@@ -12,7 +12,7 @@ param location string
   Object Schema
   subnet-name: {
     addressPrefix: string (required)
-    serviceEndpoints: array
+    serviceEndpoints: array (optional)
     securityRules: array (optional; if ommitted, no NSG will be created. If [], a default NSG will be created.)
     routes: array (optional; if ommitted, no route table will be created. If [], an empty route table will be created.)
     delegation: string (optional, can be ommitted or be empty string)
@@ -33,6 +33,14 @@ param tags object = {}
 
 @description('Custom DNS IP addresses to use for the virtual network. If empty (default), will use Azure DNS.')
 param customDnsIPs array = []
+
+@description('If peering with a hub network, specify the hub network\'s Azure resource ID. Leave empty (default) if no peering desired.')
+param remoteVNetResourceId string = ''
+@description('Optional even when peering. Only used when peering to create the name of the peering. If blank, the peering name will use the VNet name.')
+param remoteVNetFriendlyName string = ''
+
+@description('Optional even when peering. Only used when peering to create the name of the peering. If blank, the peering name will use the VNet name.')
+param vnetFriendlyName string = ''
 
 var virtualNetworkName = !empty(vNetName) ? vNetName : replace(namingStructure, '{rtype}', 'vnet')
 
@@ -76,6 +84,18 @@ module vNetModule 'vnet.bicep' = {
     routeTables: routeTableIds
     customDnsIPs: customDnsIPs
     tags: tags
+  }
+}
+
+// Create peering to hub, if specified
+module peeringModule 'networkPeering.bicep' = if (!empty(remoteVNetResourceId)) {
+  name: take(replace(deploymentNameStructure, '{rtype}', 'peering'), 64)
+  params: {
+    deploymentNameStructure: deploymentNameStructure
+    vnet1ResourceId: remoteVNetResourceId
+    vnet2ResourceId: vNetModule.outputs.vNetId
+    vnet1FriendlyName: vnetFriendlyName
+    vnet2FriendlyName: remoteVNetFriendlyName
   }
 }
 

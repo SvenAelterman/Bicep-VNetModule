@@ -25,6 +25,7 @@ param customDnsIPs array = []
 
 param includeAppGwSubnet bool = true
 param deploySampleAppSerice bool = false
+param testPeering bool = true
 
 var sequenceFormatted = format('{0:00}', sequence)
 var deploymentNameStructure = '${workloadName}-${environment}-{rtype}-${deploymentTime}'
@@ -106,7 +107,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
 }
 
 module networkModule 'modules/networking/network.bicep' = {
-  name: replace(deploymentNameStructure, '{rtype}', 'network')
+  name: take(replace(deploymentNameStructure, '{rtype}', 'network'), 64)
   scope: rg
   params: {
     deploymentNameStructure: deploymentNameStructure
@@ -116,6 +117,23 @@ module networkModule 'modules/networking/network.bicep' = {
     subnetDefs: subnetsToDeploy
     customDnsIPs: customDnsIPs
     vnetAddressPrefix: '${replace(vnetAddressPrefix, '{octet3}', '0')}/${vnetCidr}'
+  }
+}
+
+module network2Module 'modules/networking/network.bicep' = if (testPeering) {
+  name: take(replace(deploymentNameStructure, '{rtype}', 'network2'), 64)
+  scope: rg
+  params: {
+    location: location
+    deploymentNameStructure: replace(deploymentNameStructure, workloadName, '${workloadName}2')
+    namingStructure: replace(namingStructure, workloadName, '${workloadName}2')
+    // Don't need subnets just to test peering functionality
+    subnetDefs: {}
+    vnetAddressPrefix: '10.1.0.0/16'
+    tags: tags
+    remoteVNetResourceId: networkModule.outputs.vNetId
+    remoteVNetFriendlyName: 'network1'
+    vnetFriendlyName: 'network2'
   }
 }
 
