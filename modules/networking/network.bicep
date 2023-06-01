@@ -70,7 +70,7 @@ module networkRoutingModule 'networkRouting.bicep' = {
   }
 }
 
-var routeTableIds = reduce(networkRoutingModule.outputs.routeTableIds, {}, (cur, next) => union(cur, next))
+var routeTableIds = reduce(networkRoutingModule.outputs.routeTables, {}, (cur, next) => union(cur, next))
 
 // This is the parent module to deploy a VNet with subnets and output the subnets with their IDs as a custom object
 module vNetModule 'vnet.bicep' = {
