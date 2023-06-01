@@ -21,6 +21,7 @@ param deploymentTime string = utcNow()
 param vnetAddressPrefix string = '10.0.{octet3}.0'
 param vnetCidr string = '16'
 param subnetCidr string = '24'
+param customDnsIPs array = []
 param includeAppGwSubnet bool = true
 
 var sequenceFormatted = format('{0:00}', sequence)
@@ -110,6 +111,7 @@ module networkModule 'modules/networking/network.bicep' = {
     location: location
     tags: tags
     subnetDefs: subnetsToDeploy
+    customDnsIPs: customDnsIPs
     vnetAddressPrefix: '${replace(vnetAddressPrefix, '{octet3}', '0')}/${vnetCidr}'
   }
 }

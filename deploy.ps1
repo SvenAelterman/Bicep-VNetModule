@@ -23,6 +23,7 @@ $TemplateParameters = @{
 	location     = $Location
 	environment  = $Environment
 	workloadName = $WorkloadName
+	customDnsIPs = @()
 
 	# OPTIONAL
 	sequence     = $Sequence

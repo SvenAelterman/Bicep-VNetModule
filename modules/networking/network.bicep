@@ -31,6 +31,9 @@ param vnetAddressPrefix string
 @description('The Azure resource tags to apply to network security group, route table, and virtual network resources.')
 param tags object = {}
 
+@description('Custom DNS IP addresses to use for the virtual network. If empty (default), will use Azure DNS.')
+param customDnsIPs array = []
+
 var virtualNetworkName = !empty(vNetName) ? vNetName : replace(namingStructure, '{rtype}', 'vnet')
 
 // Create a network security group for each subnet that requires one
@@ -63,7 +66,7 @@ var routeTableIds = reduce(networkRoutingModule.outputs.routeTableIds, {}, (cur,
 
 // This is the parent module to deploy a VNet with subnets and output the subnets with their IDs as a custom object
 module vNetModule 'vnet.bicep' = {
-  name: replace(deploymentNameStructure, '{rtype}', 'vnet')
+  name: take(replace(deploymentNameStructure, '{rtype}', 'vnet'), 64)
   params: {
     location: location
     subnetDefs: subnetDefs
@@ -71,6 +74,7 @@ module vNetModule 'vnet.bicep' = {
     vnetAddressPrefix: vnetAddressPrefix
     networkSecurityGroups: nsgIds
     routeTables: routeTableIds
+    customDnsIPs: customDnsIPs
     tags: tags
   }
 }
