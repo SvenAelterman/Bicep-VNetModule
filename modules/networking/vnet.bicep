@@ -52,9 +52,9 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-05-01' = {
       }
     }]
 
-    dhcpOptions: {
+    dhcpOptions: !empty(customDnsIPs) ? {
       dnsServers: customDnsIPs
-    }
+    } : {}
   }
   tags: tags
 }
