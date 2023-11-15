@@ -25,8 +25,9 @@ param namingStructure string
 @description('Provide a name for the deployment. Optionally, leave an \'{rtype}\' placeholder, which will be replaced with the common resource abbreviation for Virtual Network.')
 param deploymentNameStructure string
 
-@description('A IPv4 or IPv6 address space in CIDR notation.')
-param vnetAddressPrefix string
+@description('One or more IPv4 or IPv6 addresses spaces in CIDR notation.')
+@minLength(1)
+param vnetAddressPrefixes array
 
 @description('The Azure resource tags to apply to network security group, route table, and virtual network resources.')
 param tags object = {}
@@ -79,7 +80,7 @@ module vNetModule 'vnet.bicep' = {
     location: location
     subnetDefs: subnetDefs
     vnetName: virtualNetworkName
-    vnetAddressPrefix: vnetAddressPrefix
+    vnetAddressPrefixes: vnetAddressPrefixes
     networkSecurityGroups: nsgs
     routeTables: routeTables
     customDnsIPs: customDnsIPs

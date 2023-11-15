@@ -18,9 +18,8 @@ param tags object = {}
 param sequence int = 1
 param namingConvention string = '{wloadname}-{env}-{rtype}-{loc}-{seq}'
 param deploymentTime string = utcNow()
-param vnetAddressPrefix string = '10.0.{octet3}.0'
-param vnetCidr string = '16'
-param subnetCidr string = '24'
+@minLength(1)
+param vnetAddressPrefixes array = [ '10.0.0.0/16', '10.2.0.0/16' ]
 param customDnsIPs array = []
 
 param includeAppGwSubnet bool = true
@@ -45,7 +44,7 @@ var namingStructure = replace(replace(replace(replace(namingConvention, '{env}',
 */
 var subnetDefs = {
   ComputeSubnet: {
-    addressPrefix: '${replace(vnetAddressPrefix, '{octet3}', '0')}/${subnetCidr}'
+    addressPrefix: cidrSubnet(vnetAddressPrefixes[0], 24, 0)
     serviceEndpoints: [
       {
         service: 'Microsoft.Storage'
@@ -68,7 +67,7 @@ var subnetDefs = {
     routes: []
   }
   AppServiceSubnet: {
-    addressPrefix: '${replace(vnetAddressPrefix, '{octet3}', '1')}/${subnetCidr}'
+    addressPrefix: cidrSubnet(vnetAddressPrefixes[0], 24, 1)
     serviceEndpoints: []
     // Specify an empty array of security rules. Network security group for this subnet will be created, but only contain default rules.
     securityRules: []
@@ -81,7 +80,7 @@ var subnetDefs = {
 
 var appGwSubnet = includeAppGwSubnet ? {
   ApplicationGatewaySubnet: {
-    addressPrefix: '${replace(vnetAddressPrefix, '{octet3}', '255')}/${subnetCidr}'
+    addressPrefix: cidrSubnet(vnetAddressPrefixes[0], 24, 255)
     securityRules: []
     // Explicitly specify no delegation of this subnet
     delegation: ''
@@ -116,7 +115,7 @@ module networkModule 'modules/networking/network.bicep' = {
     tags: tags
     subnetDefs: subnetsToDeploy
     customDnsIPs: customDnsIPs
-    vnetAddressPrefix: '${replace(vnetAddressPrefix, '{octet3}', '0')}/${vnetCidr}'
+    vnetAddressPrefixes: map(vnetAddressPrefixes, p => replace(p, '{octet3}', '0'))
   }
 }
 
@@ -129,7 +128,7 @@ module network2Module 'modules/networking/network.bicep' = if (testPeering) {
     namingStructure: replace(namingStructure, workloadName, '${workloadName}2')
     // Don't need subnets just to test peering functionality
     subnetDefs: {}
-    vnetAddressPrefix: '10.1.0.0/16'
+    vnetAddressPrefixes: ['10.1.0.0/16']
     tags: tags
     remoteVNetResourceId: networkModule.outputs.vNetId
     remoteVNetFriendlyName: 'network1'

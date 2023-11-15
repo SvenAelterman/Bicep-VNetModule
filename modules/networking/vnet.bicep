@@ -1,7 +1,8 @@
 param location string
 param vnetName string
 param subnetDefs object
-param vnetAddressPrefix string
+@minLength(1)
+param vnetAddressPrefixes array
 
 @description('The NSG object must have a property with the name of the subnet. The value of the property is an object containing an id property. {subnet-name: { id: nsg-id }}')
 param networkSecurityGroups object = {}
@@ -20,9 +21,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-05-01' = {
   location: location
   properties: {
     addressSpace: {
-      addressPrefixes: [
-        vnetAddressPrefix
-      ]
+      addressPrefixes: vnetAddressPrefixes
     }
 
     // Loop through each subnet in the array
