@@ -21,6 +21,8 @@ param deploymentTime string = utcNow()
 @minLength(1)
 param vnetAddressPrefixes array = [ '10.0.0.0/16', '10.2.0.0/16' ]
 param customDnsIPs array = []
+@description('The definition of additional subnets that have been manually created. Uses the ARM schema for subnets.')
+param additionalSubnets array
 
 param includeAppGwSubnet bool = true
 param deploySampleAppSerice bool = false
@@ -114,6 +116,7 @@ module networkModule 'modules/networking/network.bicep' = {
     location: location
     tags: tags
     subnetDefs: subnetsToDeploy
+    additionalSubnets: additionalSubnets
     customDnsIPs: customDnsIPs
     vnetAddressPrefixes: map(vnetAddressPrefixes, p => replace(p, '{octet3}', '0'))
   }
@@ -128,7 +131,7 @@ module network2Module 'modules/networking/network.bicep' = if (testPeering) {
     namingStructure: replace(namingStructure, workloadName, '${workloadName}2')
     // Don't need subnets just to test peering functionality
     subnetDefs: {}
-    vnetAddressPrefixes: ['10.1.0.0/16']
+    vnetAddressPrefixes: [ '10.1.0.0/16' ]
     tags: tags
     remoteVNetResourceId: networkModule.outputs.vNetId
     remoteVNetFriendlyName: 'network1'

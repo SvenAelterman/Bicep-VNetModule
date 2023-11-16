@@ -20,15 +20,31 @@ Param(
 
 $TemplateParameters = @{
 	# REQUIRED
-	location     = $Location
-	environment  = $Environment
-	workloadName = $WorkloadName
-	customDnsIPs = @()
+	location          = $Location
+	environment       = $Environment
+	workloadName      = $WorkloadName
+	customDnsIPs      = @()
+
+	additionalSubnets = @(
+		@{
+			name       = 'ApplicationGateway2Subnet'
+			properties = @{
+				addressPrefix        = '10.0.2.0/24'
+				networkSecurityGroup = @{
+					id = '/subscriptions/05bca35e-0dfa-455a-a4eb-9f9ea72df723/resourceGroups/bicepvnet-test-rg-eastus-01/providers/Microsoft.Network/networkSecurityGroups/sample-test-nsg-eastus-01'
+				}
+				routeTable           = @{
+					id = '/subscriptions/05bca35e-0dfa-455a-a4eb-9f9ea72df723/resourceGroups/bicepvnet-test-rg-eastus-01/providers/Microsoft.Network/routeTables/sample-test-rt-eastus-01'
+				}
+				delegations          = @()
+			}
+		}
+	)
 
 	# OPTIONAL
-	sequence     = $Sequence
+	sequence          = $Sequence
 	#namingConvention = $NamingConvention
-	tags         = @{
+	tags              = @{
 		'date-created' = (Get-Date -Format 'yyyy-MM-dd')
 		purpose        = $Environment
 		lifetime       = 'short'

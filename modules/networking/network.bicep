@@ -19,6 +19,9 @@ param location string
   } */
 @description('A custom object defining the subnet properties of each subnet. { subnet-name: { addressPrefix: string, serviceEndpoints: [], securityRules: [], routes: [], delegation: string } }')
 param subnetDefs object
+@description('The definition of additional subnets that have been manually created. Uses the ARM schema for subnets.')
+param additionalSubnets array = []
+
 @description('String representing the naming convention where \'{rtype}\' is a placeholder for vnet, rt, nsg, etc.')
 param namingStructure string
 
@@ -84,6 +87,7 @@ module vNetModule 'vnet.bicep' = {
     networkSecurityGroups: nsgs
     routeTables: routeTables
     customDnsIPs: customDnsIPs
+    additionalSubnets: additionalSubnets
     tags: tags
   }
 }
