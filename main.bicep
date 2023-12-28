@@ -107,7 +107,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   tags: tags
 }
 
-module networkModule 'modules/networking/network.bicep' = {
+module networkModule 'modules/networking/main.bicep' = {
   name: take(replace(deploymentNameStructure, '{rtype}', 'network'), 64)
   scope: rg
   params: {
@@ -122,7 +122,7 @@ module networkModule 'modules/networking/network.bicep' = {
   }
 }
 
-module network2Module 'modules/networking/network.bicep' = if (testPeering) {
+module network2Module 'modules/networking/main.bicep' = if (testPeering) {
   name: take(replace(deploymentNameStructure, '{rtype}', 'network2'), 64)
   scope: rg
   params: {

@@ -11,10 +11,7 @@ Param(
 	# The environment descriptor
 	[ValidateSet('test', 'demo', 'prod')]
 	[string]$Environment = 'test',
-	#
-	#[Parameter(Mandatory = $true)]
 	[string]$WorkloadName = 'bicepvnet',
-	#
 	[int]$Sequence = 1
 )
 
